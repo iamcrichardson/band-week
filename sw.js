@@ -1,5 +1,5 @@
 // Bump this when you change any file, so phones pick up the new version.
-const VERSION = "band-week-v1";
+const VERSION = "band-week-v2";
 const FONT_CACHE = "band-week-fonts";
 
 const FILES = [
@@ -15,7 +15,9 @@ const FILES = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(VERSION).then((c) => c.addAll(FILES)).then(() => self.skipWaiting()));
+  // cache: "reload" skips the browser's own HTTP cache, so a new version gets fresh files
+  const fresh = FILES.map((f) => new Request(f, { cache: "reload" }));
+  event.waitUntil(caches.open(VERSION).then((c) => c.addAll(fresh)).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {

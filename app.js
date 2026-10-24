@@ -1,7 +1,14 @@
 /* =====================================================================
    ROUTINES — edit this list to swap moves.
-   Each move needs: name, cue (one line of form advice), and search
+   Each move needs: name, cue (one line of form advice), and q
    (the words used for the "Watch a demo" YouTube search).
+
+   Optional extras on a move:
+     band: which band it uses, shown on the timer (e.g. "Loop band")
+     alt:  a second version you can pick with a toggle on the home screen,
+           written as { name, cue, q, band }
+   Optional extra on a routine:
+     note: one line of helper text shown above its list
    ===================================================================== */
 const ROUTINES = [
   {
@@ -9,23 +16,39 @@ const ROUTINES = [
     title: "Legs + glutes",
     equipment: "Fabric loop band, medium",
     moves: [
-      { name: "Banded squat", cue: "Band above knees. Sit back like there's a chair, push knees out against the band.", search: "banded squat mini loop band form" },
-      { name: "Glute bridge", cue: "On your back, band above knees. Squeeze your bum to lift hips, pause at the top.", search: "banded glute bridge form" },
-      { name: "Side steps", cue: "Band above knees, slight squat. Small steps sideways, 4 one way then 4 back.", search: "banded lateral walk form" },
-      { name: "Clamshells", cue: "Lie on your side, knees bent, band above knees. Open the top knee, keep feet together. Switch sides at round two.", search: "banded clamshell exercise form" },
-      { name: "Kickbacks", cue: "On hands and knees, band above knees. Push one heel up to the ceiling. Alternate legs.", search: "banded donkey kick on all fours form" },
+      { name: "Banded squat", cue: "Band above knees. Sit back like there's a chair, push knees out against the band.", q: "banded squat mini loop band form" },
+      { name: "Glute bridge", cue: "On your back, band above knees. Squeeze your bum to lift hips, pause at the top.", q: "banded glute bridge form" },
+      { name: "Side steps", cue: "Band above knees, slight squat. Small steps sideways, 4 one way then 4 back.", q: "banded lateral walk form" },
+      { name: "Clamshells", cue: "Lie on your side, knees bent, band above knees. Open the top knee, keep feet together. Switch sides at round two.", q: "banded clamshell exercise form" },
+      { name: "Kickbacks", cue: "On hands and knees, band above knees. Push one heel up to the ceiling. Alternate legs.", q: "banded donkey kick on all fours form" },
     ],
   },
   {
     id: "B",
     title: "Arms, shoulders + back",
-    equipment: "Fabric loop band, light, around wrists",
+    equipment: "Loop band (light, around wrists) or long band (under your feet)",
+    note: "Long band too hard or too easy? Stand with feet wider for more tension, closer for less.",
     moves: [
-      { name: "Band pull-apart", cue: "Light band around wrists, arms straight out in front. Pull hands apart, squeeze shoulder blades.", search: "mini band pull apart wrists form" },
-      { name: "Overhead pull-down", cue: "Arms up overhead, band around wrists. Pull elbows down to your sides like a goalpost, then reach up.", search: "mini band overhead lat pulldown form" },
-      { name: "Elbow-tucked rotations", cue: "Elbows glued to your sides, bent 90°. Rotate forearms outward against the band.", search: "mini band external rotation elbows at side" },
-      { name: "Counter push-up", cue: "Hands on the kitchen counter, body in a straight line. Lower chest towards the edge, push away.", search: "incline push up kitchen counter beginner" },
-      { name: "Wall slides", cue: "Forearms on a wall, band around wrists. Press out gently and slide arms up, then back down.", search: "banded wall slide forearms mini band" },
+      {
+        name: "Band pull-apart", band: "Loop band", cue: "Light band around wrists, arms straight out in front. Pull hands apart, squeeze shoulder blades.", q: "mini band pull apart wrists form",
+        alt: { name: "Bent-over row", band: "Long band", cue: "Stand on the band, hinge forward with a flat back. Pull your elbows back past your ribs, squeeze, lower slowly.", q: "resistance band bent over row standing on band" },
+      },
+      {
+        name: "Overhead pull-down", band: "Loop band", cue: "Arms up overhead, band around wrists. Pull elbows down to your sides like a goalpost, then reach up.", q: "mini band overhead lat pulldown form",
+        alt: { name: "Overhead press", band: "Long band", cue: "Stand on the band, hands at shoulders. Press straight up without arching your back, lower slowly.", q: "resistance band overhead shoulder press standing on band" },
+      },
+      {
+        name: "Elbow-tucked rotations", band: "Loop band", cue: "Elbows glued to your sides, bent 90°. Rotate forearms outward against the band.", q: "mini band external rotation elbows at side",
+        alt: { name: "Bicep curl", band: "Long band", cue: "Stand on the band, palms forward, elbows pinned to your sides. Curl up, lower slowly.", q: "resistance band bicep curl standing on band" },
+      },
+      {
+        name: "Counter push-up", band: "Loop band", cue: "Hands on the kitchen counter, body in a straight line. Lower chest towards the edge, push away.", q: "incline push up kitchen counter beginner",
+        alt: { name: "Overhead tricep extension", band: "Long band", cue: "Stand on the band with one foot, hold the other end behind your head with both hands. Straighten your arms up, bend back down.", q: "resistance band overhead tricep extension standing" },
+      },
+      {
+        name: "Wall slides", band: "Loop band", cue: "Forearms on a wall, band around wrists. Press out gently and slide arms up, then back down.", q: "banded wall slide forearms mini band",
+        alt: { name: "Lateral raise", band: "Long band", cue: "Stand on the band, arms by your sides. Lift arms out to shoulder height with a slight bend in the elbows, lower slowly.", q: "resistance band lateral raise standing on band" },
+      },
     ],
   },
   {
@@ -33,11 +56,11 @@ const ROUTINES = [
     title: "Core",
     equipment: "Band only for the last move",
     moves: [
-      { name: "Dead bug", cue: "On your back, arms up, knees over hips. Lower opposite arm and leg slowly, keep lower back on the floor.", search: "dead bug exercise beginner form" },
-      { name: "Bird dog", cue: "On hands and knees. Reach opposite arm and leg out long, pause, come back. Alternate.", search: "bird dog exercise form" },
-      { name: "Side plank on knees", cue: "On your forearm, knees bent and stacked. Lift hips and hold. Switch sides at round two.", search: "modified side plank on knees form" },
-      { name: "Heel taps", cue: "On your back, knees bent, head lifted. Reach side to side to tap each heel.", search: "lying heel taps ab exercise" },
-      { name: "Banded toe taps", cue: "On your back, band around feet, knees at 90°. Lower one foot to tap the floor, alternate.", search: "banded toe taps mini band core" },
+      { name: "Dead bug", cue: "On your back, arms up, knees over hips. Lower opposite arm and leg slowly, keep lower back on the floor.", q: "dead bug exercise beginner form" },
+      { name: "Bird dog", cue: "On hands and knees. Reach opposite arm and leg out long, pause, come back. Alternate.", q: "bird dog exercise form" },
+      { name: "Side plank on knees", cue: "On your forearm, knees bent and stacked. Lift hips and hold. Switch sides at round two.", q: "modified side plank on knees form" },
+      { name: "Heel taps", cue: "On your back, knees bent, head lifted. Reach side to side to tap each heel.", q: "lying heel taps ab exercise" },
+      { name: "Banded toe taps", cue: "On your back, band around feet, knees at 90°. Lower one foot to tap the floor, alternate.", q: "banded toe taps mini band core" },
     ],
   },
 ];
@@ -107,20 +130,69 @@ function selectTab(i) {
   });
   $("panel").setAttribute("aria-labelledby", "tab-" + r.id);
   $("equipment").textContent = r.equipment;
+  $("note").textContent = r.note || "";
+  $("note").hidden = !r.note;
 
   const list = $("moves");
   list.innerHTML = "";
-  for (const m of r.moves) {
+  r.moves.forEach((m, i) => {
     const li = document.createElement("li");
     li.innerHTML = `<p class="move-title"></p><p class="move-cue-small"></p><a class="demo-link" target="_blank" rel="noopener">Watch a demo</a>`;
-    li.querySelector(".move-title").textContent = m.name;
-    li.querySelector(".move-cue-small").textContent = m.cue;
-    const a = li.querySelector("a");
-    a.href = demoUrl(m.search);
-    a.setAttribute("aria-label", "Watch a demo of " + m.name);
+    if (m.alt) li.querySelector(".move-title").after(buildToggle(r, m, i, li));
+    fillMove(li, resolveMove(r, m));
     list.appendChild(li);
-  }
+  });
   $("start").setAttribute("aria-label", `Start routine ${r.id}: ${r.title}`);
+}
+
+function fillMove(li, m) {
+  li.querySelector(".move-title").textContent = m.name;
+  li.querySelector(".move-cue-small").textContent = m.cue;
+  const a = li.querySelector(".demo-link");
+  a.href = demoUrl(m.q);
+  a.setAttribute("aria-label", "Watch a demo of " + m.name);
+}
+
+/* ---------- Band choice (a saved preference, not tracking) ---------- */
+
+const CHOICE_KEY = "bandweek.bandChoice";
+// Shorter wording for the toggle buttons
+const TOGGLE_LABELS = { "Loop band": "Loop" };
+
+let choices = {};
+try { choices = JSON.parse(recall(CHOICE_KEY)) || {}; } catch (e) { choices = {}; }
+
+const choiceKey = (routine, move) => routine.id + ":" + move.name;
+
+function resolveMove(routine, move) {
+  return move.alt && choices[choiceKey(routine, move)] === "alt" ? move.alt : move;
+}
+
+function buildToggle(routine, move, index, li) {
+  const group = document.createElement("div");
+  group.className = "band-toggle";
+  group.setAttribute("role", "radiogroup");
+  group.setAttribute("aria-label", `Band for move ${index + 1}, ${move.name}`);
+
+  const current = resolveMove(routine, move) === move.alt ? "alt" : "main";
+  for (const [value, version] of [["main", move], ["alt", move.alt]]) {
+    const band = version.band || (value === "main" ? "Loop band" : "Long band");
+    const label = document.createElement("label");
+    label.innerHTML = `<input type="radio"><span></span>`;
+    const input = label.querySelector("input");
+    input.name = `band-${routine.id}-${index}`;
+    input.value = value;
+    input.checked = value === current;
+    input.addEventListener("change", () => {
+      choices[choiceKey(routine, move)] = value;
+      store(CHOICE_KEY, JSON.stringify(choices));
+      fillMove(li, version);
+    });
+    label.querySelector("span").textContent = TOGGLE_LABELS[band] || band;
+    input.setAttribute("aria-label", `${band}: ${version.name}`);
+    group.appendChild(label);
+  }
+  return group;
 }
 
 /* ---------- Sound ---------- */
@@ -204,6 +276,7 @@ function buildPlan(routine) {
 
 const run = {
   routine: null,
+  moves: [],      // the chosen version of each move for this workout
   plan: [],
   index: 0,
   endsAt: 0,      // performance.now() timestamp when the current interval ends
@@ -218,6 +291,8 @@ function startWorkout() {
   initAudio();
   lockScreen();
   run.routine = ROUTINES[selected];
+  // Use whichever version (loop / long band) is picked for each move
+  run.moves = run.routine.moves.map((m) => resolveMove(run.routine, m));
   run.plan = buildPlan(run.routine);
   run.paused = false;
   $("pause").textContent = "Pause";
@@ -238,7 +313,7 @@ function enterInterval(index, startTime) {
 }
 
 function renderStep(step) {
-  const moves = run.routine.moves;
+  const moves = run.moves;
   const move = moves[step.move];
   const timer = $("timer");
   timer.classList.toggle("is-ready", step.type === "ready");
@@ -248,8 +323,10 @@ function renderStep(step) {
   $("phase").textContent = phase;
   $("position").textContent = `Round ${step.round} of ${ROUNDS} · move ${step.move + 1} of ${moves.length}`;
   $("t-name").textContent = move.name;
+  $("t-band").textContent = move.band || "";
+  $("t-band").hidden = !move.band;
   $("t-cue").textContent = move.cue;
-  $("t-demo").href = demoUrl(move.search);
+  $("t-demo").href = demoUrl(move.q);
 
   // "Then: …" only during work, and not on the very last move
   const next = run.plan[run.index + 2]; // index+1 is the rest
@@ -369,4 +446,17 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").catch(() => {});
   });
+
+  // When a new version takes over, reload to show it, but never mid-workout
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloadPending = false;
+  const reloadIfIdle = () => {
+    if ($("timer").hidden) location.reload();
+    else reloadPending = true;
+  };
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (hadController) reloadIfIdle();
+  });
+  $("close").addEventListener("click", () => { if (reloadPending) location.reload(); });
+  $("stop").addEventListener("click", () => { if (reloadPending) location.reload(); });
 }
