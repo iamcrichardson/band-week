@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Band Week</title>
+  <meta name="description" content="Three short resistance-band routines. Do each once a week, any day, any order.">
+
+  <!-- Theme colours (dark by default, light when the system is light) -->
+  <meta name="theme-color" content="#1a1220" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f6f1f8" media="(prefers-color-scheme: light)">
+  <meta name="color-scheme" content="dark light">
+
+  <!-- PWA + iOS home screen -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Band Week">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Fonts (cached by the service worker; system fonts are used if they can't load) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 1. Home -->
+  <main id="home" class="screen">
+    <header class="home-head">
+      <h1>Band Week</h1>
+      <p class="tagline">Three short routines. Do each once a week, any day, any order.</p>
+    </header>
+
+    <div class="tabs" role="tablist" aria-label="Routines" id="tabs"></div>
+
+    <section id="panel" class="panel" role="tabpanel" aria-labelledby="">
+      <p class="equipment" id="equipment"></p>
+      <ol class="moves" id="moves"></ol>
+    </section>
+
+    <div class="start-wrap">
+      <button class="btn btn-primary btn-start" id="start">Start</button>
+    </div>
+  </main>
+
+  <!-- 2. Timer -->
+  <section id="timer" class="screen" hidden aria-live="off">
+    <div class="timer-top">
+      <p class="phase" id="phase">Get ready</p>
+      <p class="position" id="position">Round 1 of 2 · move 1 of 5</p>
+    </div>
+
+    <div class="count" id="count" aria-hidden="true">10</div>
+
+    <div class="move-info">
+      <h2 class="move-name" id="t-name"></h2>
+      <p class="move-cue" id="t-cue"></p>
+      <a class="demo" id="t-demo" target="_blank" rel="noopener">Watch a demo</a>
+      <p class="then" id="t-then"></p>
+    </div>
+
+    <div class="progress" aria-hidden="true"><div class="progress-fill" id="bar"></div></div>
+
+    <div class="controls">
+      <button class="btn btn-ghost" id="stop">Stop</button>
+      <button class="btn btn-primary" id="pause">Pause</button>
+      <button class="btn btn-ghost" id="skip">Skip</button>
+    </div>
+    <p class="sr-only" id="announce" aria-live="polite"></p>
+  </section>
+
+  <!-- 3. Done -->
+  <section id="done" class="screen" hidden>
+    <div class="done-body">
+      <h2 class="done-title" id="done-title"></h2>
+      <p class="done-sub">That's this one covered for the week.</p>
+    </div>
+    <button class="btn btn-primary btn-start" id="close">Close</button>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
