@@ -163,6 +163,30 @@ a { color: var(--accent); }
 
 .move-title { font-weight: 700; font-size: 1.3rem; margin: 0 0 0.2rem; }
 
+/* Setup pictures (drawn by poses.js) */
+.setup {
+  flex: none;
+  border-radius: 0.75rem;
+  background: var(--surface-2);
+  color: var(--text);
+  line-height: 0;
+}
+.setup svg { width: 100%; height: auto; }
+.setup polyline, .setup line {
+  fill: none; stroke-linecap: round; stroke-linejoin: round;
+}
+.pz-body { stroke: currentColor; stroke-width: 3.5; }
+.pz-far { stroke: currentColor; stroke-width: 3.5; opacity: 0.4; }
+.pz-head { fill: currentColor; }
+.pz-band { stroke: var(--accent); stroke-width: 3; }
+.pz-prop { stroke: var(--line); stroke-width: 2; fill: none; }
+.pz-arrow { stroke: var(--muted); stroke-width: 1.75; opacity: 0.8; }
+.moves .setup {
+  float: right;
+  width: 6.5rem;
+  margin: 0 0 0.4rem 0.75rem;
+}
+
 /* Loop | Long band toggle */
 .band-toggle {
   display: inline-grid;
@@ -315,6 +339,11 @@ a { color: var(--accent); }
   font-size: 1rem; font-weight: 700;
 }
 .move-cue { margin: 0 auto 0.2rem; max-width: 30rem; font-size: 1.15rem; }
+.move-body { display: flex; align-items: flex-start; gap: 0.85rem; justify-content: center; }
+#timer.has-pic .move-body { text-align: left; }
+#timer.has-pic .move-cue { font-size: 1.05rem; line-height: 1.4; }
+#timer .setup { width: 7rem; margin-top: 0.15rem; }
+#timer.is-rest .pz-band { stroke: var(--rest); }
 .demo { display: inline-block; padding: 0.3rem; font-weight: 700; }
 
 /* Up next */
@@ -387,6 +416,23 @@ a { color: var(--accent); }
 .done-body { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; }
 .done-title { font-size: 2.6rem; font-weight: 800; color: var(--accent); }
 .done-sub { font-size: 1.35rem; color: var(--muted); }
+
+/* ---------- Most phones: keep the whole timer on one screen ---------- */
+@media (max-height: 860px) {
+  #timer { padding-top: calc(0.75rem + var(--safe-t)); padding-bottom: calc(0.75rem + var(--safe-b)); }
+  .t-bar { margin-bottom: 0.5rem; }
+  .icon-btn { width: 2.75rem; height: 2.75rem; }
+  .position { margin-top: 0.35rem; font-size: 0.95rem; }
+  .dial { width: min(62vw, 24vh, 18rem); margin: 0.5rem auto 0.35rem; }
+  .count { font-size: clamp(3rem, 9vh, 7rem); }
+  .move-name { font-size: 1.45rem; margin-bottom: 0.25rem; }
+  .band-label { margin-bottom: 0.4rem; font-size: 0.9rem; }
+  #timer .setup { width: 5.75rem; }
+  #timer.has-pic .move-cue { font-size: 1rem; line-height: 1.35; }
+  .next-card { margin: 0.4rem 0 0.5rem; padding: 0.45rem 0.9rem; }
+  .ctrl svg { width: 3.5rem; height: 3.5rem; padding: 0.95rem; }
+  .ctrl-main svg { width: 4.75rem; height: 4.75rem; padding: 1.35rem; }
+}
 
 /* ---------- Small / landscape ---------- */
 @media (max-height: 600px) and (orientation: landscape) {

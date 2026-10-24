@@ -78,8 +78,13 @@
     <div class="move-info">
       <h2 class="move-name" id="t-name"></h2>
       <p class="band-label" id="t-band" hidden></p>
-      <p class="move-cue" id="t-cue"></p>
-      <a class="demo" id="t-demo" target="_blank" rel="noopener">Watch a demo</a>
+      <div class="move-body">
+        <div class="setup" id="t-pic" role="img"></div>
+        <div>
+          <p class="move-cue" id="t-cue"></p>
+          <a class="demo" id="t-demo" target="_blank" rel="noopener">Watch a demo</a>
+        </div>
+      </div>
     </div>
 
     <div class="next-card" id="next-card" hidden>
@@ -125,6 +130,7 @@
     <button class="btn btn-primary btn-start" id="close">Close</button>
   </section>
 
+  <script src="poses.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

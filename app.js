@@ -137,7 +137,7 @@ function selectTab(i) {
   list.innerHTML = "";
   r.moves.forEach((m, i) => {
     const li = document.createElement("li");
-    li.innerHTML = `<p class="move-title"></p><p class="move-cue-small"></p><a class="demo-link" target="_blank" rel="noopener">Watch a demo</a>`;
+    li.innerHTML = `<div class="setup" role="img"></div><p class="move-title"></p><p class="move-cue-small"></p><a class="demo-link" target="_blank" rel="noopener">Watch a demo</a>`;
     if (m.alt) li.querySelector(".move-title").after(buildToggle(r, m, i, li));
     fillMove(li, resolveMove(r, m));
     list.appendChild(li);
@@ -145,7 +145,15 @@ function selectTab(i) {
   $("start").setAttribute("aria-label", `Start routine ${r.id}: ${r.title}`);
 }
 
+// Put a move's setup picture into a .setup box (hidden if there isn't one)
+function showPicture(box, m) {
+  box.innerHTML = drawPose(m.name);
+  box.hidden = !box.innerHTML;
+  box.setAttribute("aria-label", "Setup for " + m.name);
+}
+
 function fillMove(li, m) {
+  showPicture(li.querySelector(".setup"), m);
   li.querySelector(".move-title").textContent = m.name;
   li.querySelector(".move-cue-small").textContent = m.cue;
   const a = li.querySelector(".demo-link");
@@ -354,6 +362,8 @@ function renderStep(step) {
   $("t-band").hidden = !move.band;
   $("t-cue").textContent = move.cue;
   $("t-demo").href = demoUrl(move.q);
+  showPicture($("t-pic"), move);
+  $("timer").classList.toggle("has-pic", !$("t-pic").hidden);
 
   // "Up next" only during work, and not on the very last move
   const next = run.plan[run.index + 2]; // index+1 is the rest

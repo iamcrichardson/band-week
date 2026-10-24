@@ -1,5 +1,5 @@
 // Bump this when you change any file, so phones pick up the new version.
-const VERSION = "band-week-v3";
+const VERSION = "band-week-v4";
 const FONT_CACHE = "band-week-fonts";
 
 const FILES = [
@@ -7,6 +7,7 @@ const FILES = [
   "index.html",
   "styles.css",
   "app.js",
+  "poses.js",
   "manifest.json",
   "icons/icon-192.png",
   "icons/icon-512.png",
