@@ -60,7 +60,7 @@ const ROUTINES = [
       { name: "Bird dog", cue: "On hands and knees. Reach opposite arm and leg out long, pause, come back. Alternate.", q: "bird dog exercise form" },
       { name: "Side plank on knees", cue: "On your forearm, knees bent and stacked. Lift hips and hold. Switch sides at round two.", q: "modified side plank on knees form" },
       { name: "Heel taps", cue: "On your back, knees bent, head lifted. Reach side to side to tap each heel.", q: "lying heel taps ab exercise" },
-      { name: "Banded toe taps", cue: "On your back, band around feet, knees at 90°. Lower one foot to tap the floor, alternate.", q: "banded toe taps mini band core" },
+      { name: "Banded toe taps", cue: "On your back, band just above your knees, knees over hips at 90°. Keep your ribs down, lower one foot to tap the floor, alternate.", q: "banded toe taps mini band core" },
     ],
   },
 ];

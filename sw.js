@@ -1,5 +1,5 @@
 // Bump this when you change any file, so phones pick up the new version.
-const VERSION = "band-week-v4";
+const VERSION = "band-week-v5";
 const FONT_CACHE = "band-week-fonts";
 
 const FILES = [
