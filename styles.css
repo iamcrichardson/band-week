@@ -211,25 +211,100 @@ a { color: var(--accent); }
 #timer.is-rest { --phase-color: var(--rest); }
 #timer.is-ready { --phase-color: var(--muted); }
 
-.timer-top { display: flex; flex-direction: column; gap: 0.25rem; }
+/* Top bar: small end button, routine name, time left */
+.t-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.icon-btn {
+  width: 3rem; height: 3rem;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.icon-btn svg { width: 1.25rem; height: 1.25rem; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; fill: none; }
+.t-routine {
+  margin: 0; font-weight: 700; font-size: 1rem; color: var(--muted);
+  text-align: left;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.t-left {
+  margin: 0; padding: 0.3rem 0.7rem;
+  border-radius: 1rem;
+  background: var(--surface-2);
+  font-size: 0.95rem; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Timeline of the whole workout */
+.timeline { display: flex; gap: 3px; height: 0.6rem; }
+.seg {
+  --p: 0;
+  position: relative;
+  min-width: 3px;
+  border-radius: 0.3rem;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+.seg::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(var(--p));
+}
+.seg-rest::after { background: var(--rest); }
+.seg-ready::after { background: var(--muted); }
+.seg-rest { opacity: 0.75; }
+.seg.round-start { margin-left: 0.6rem; }
+.seg.is-current { outline: 2px solid var(--phase-color); outline-offset: 1px; }
+
+.position { margin: 0.5rem 0 0; color: var(--muted); font-size: 1rem; }
+
+/* Countdown dial */
+.dial {
+  position: relative;
+  width: min(62vw, 32vh, 18rem);
+  aspect-ratio: 1;
+  margin: 0.75rem auto 0.5rem;
+}
+.ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 8; }
+.ring-track { stroke: var(--surface-2); }
+.ring-fill { stroke: var(--phase-color); stroke-linecap: round; }
+.dial-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
 .phase {
   margin: 0;
   font-family: var(--font-head); font-weight: 800;
-  font-size: 2rem; color: var(--phase-color);
+  font-size: clamp(0.95rem, 4vw, 1.2rem); color: var(--phase-color);
+  max-width: 62%;
+  line-height: 1.15;
 }
-.position { margin: 0; color: var(--muted); font-size: 1.1rem; }
-
 .count {
   font-family: var(--font-head); font-weight: 800;
-  font-size: clamp(7rem, 38vw, 14rem);
+  font-size: clamp(3.5rem, min(20vw, 11vh), 7rem);
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  margin: 1rem 0 0.5rem;
-  color: var(--phase-color);
+  color: var(--text);
 }
+#timer.is-paused .ring-fill,
+#timer.is-paused .count { opacity: 0.45; }
+#timer.is-paused .phase { color: var(--text); }
 
+/* Current move */
 .move-info { flex: 1; }
-.move-name { font-size: 2rem; font-weight: 800; margin-bottom: 0.4rem; }
+.move-name { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.35rem; }
 .band-label {
   display: inline-block;
   margin: 0 0 0.6rem;
@@ -239,26 +314,70 @@ a { color: var(--accent); }
   color: var(--muted);
   font-size: 1rem; font-weight: 700;
 }
-.move-cue { margin: 0 auto 0.5rem; max-width: 30rem; font-size: 1.25rem; }
-.demo { display: inline-block; padding: 0.4rem; font-weight: 700; }
-.then { margin: 0.75rem 0 0; color: var(--muted); }
+.move-cue { margin: 0 auto 0.2rem; max-width: 30rem; font-size: 1.15rem; }
+.demo { display: inline-block; padding: 0.3rem; font-weight: 700; }
 
-.progress {
-  height: 0.75rem; border-radius: 1rem;
+/* Up next */
+.next-card {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.6rem 1rem;
+  border-radius: 1rem;
+  background: var(--surface);
+  text-align: left;
+}
+.next-label {
+  flex: none;
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted);
+}
+.next-name { font-weight: 700; font-size: 1.1rem; }
+
+/* Back / Pause / Skip */
+.controls {
+  display: flex; justify-content: center; align-items: flex-start;
+  gap: 1.75rem;
+}
+.ctrl {
+  font: inherit;
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+  background: none; border: 0; padding: 0;
+  color: var(--text);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.ctrl svg {
+  width: 4rem; height: 4rem; padding: 1.1rem;
+  border-radius: 50%;
   background: var(--surface-2);
-  overflow: hidden;
-  margin: 1rem 0;
+  transition: transform 0.1s ease;
 }
-.progress-fill {
-  height: 100%; width: 100%;
+.ctrl .solid { fill: currentColor; }
+.ctrl span { font-size: 0.95rem; font-weight: 700; color: var(--muted); }
+.ctrl-main svg {
+  width: 5.5rem; height: 5.5rem; padding: 1.6rem;
   background: var(--phase-color);
-  transform-origin: left center;
-  transform: scaleX(0);
+  color: var(--on-accent);
 }
+#timer.is-rest .ctrl-main svg { color: var(--on-rest); }
+.ctrl:active svg { transform: scale(0.94); }
+.ctrl:focus-visible { outline: none; }
+.ctrl:focus-visible svg { outline: 3px solid var(--accent); outline-offset: 3px; }
 
-.controls { display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 0.6rem; }
-.controls .btn { min-height: 4.5rem; }
-#timer.is-rest #pause { background: var(--rest); color: var(--on-rest); }
+/* "Are you sure?" sheet */
+.sheet {
+  width: min(26rem, calc(100vw - 2rem));
+  padding: 1.5rem;
+  border: 0;
+  border-radius: 1.25rem;
+  background: var(--surface);
+  color: var(--text);
+  text-align: center;
+}
+.sheet::backdrop { background: rgb(10 5 15 / 0.65); }
+.sheet h2 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+.sheet p { margin: 0 0 1.25rem; color: var(--muted); }
+.sheet-actions { display: grid; gap: 0.6rem; }
 
 /* ---------- Done ---------- */
 #done {
@@ -271,7 +390,8 @@ a { color: var(--accent); }
 
 /* ---------- Small / landscape ---------- */
 @media (max-height: 600px) and (orientation: landscape) {
-  .count { font-size: 6rem; margin: 0.25rem 0; }
+  .dial { width: min(40vh, 12rem); margin-top: 0.5rem; }
+  .count { font-size: 3.5rem; }
   .move-name { font-size: 1.5rem; }
 }
 

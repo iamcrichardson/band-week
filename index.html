@@ -50,31 +50,71 @@
   </main>
 
   <!-- 2. Timer -->
-  <section id="timer" class="screen" hidden aria-live="off">
-    <div class="timer-top">
-      <p class="phase" id="phase">Get ready</p>
-      <p class="position" id="position">Round 1 of 2 · move 1 of 5</p>
-    </div>
+  <section id="timer" class="screen" hidden>
+    <header class="t-bar">
+      <button class="icon-btn" id="stop" aria-label="End workout">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <p class="t-routine" id="t-routine"></p>
+      <p class="t-left" id="t-left"></p>
+    </header>
 
-    <div class="count" id="count" aria-hidden="true">10</div>
+    <!-- Timeline: one segment per interval, for this workout only -->
+    <div class="timeline" id="timeline" role="progressbar" aria-label="Workout progress"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+    <p class="position" id="position"></p>
+
+    <div class="dial">
+      <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+        <circle class="ring-track" cx="60" cy="60" r="54"/>
+        <circle class="ring-fill" id="ring" cx="60" cy="60" r="54"/>
+      </svg>
+      <div class="dial-inner">
+        <p class="phase" id="phase">Get ready</p>
+        <div class="count" id="count" aria-hidden="true">10</div>
+      </div>
+    </div>
 
     <div class="move-info">
       <h2 class="move-name" id="t-name"></h2>
       <p class="band-label" id="t-band" hidden></p>
       <p class="move-cue" id="t-cue"></p>
       <a class="demo" id="t-demo" target="_blank" rel="noopener">Watch a demo</a>
-      <p class="then" id="t-then"></p>
     </div>
 
-    <div class="progress" aria-hidden="true"><div class="progress-fill" id="bar"></div></div>
+    <div class="next-card" id="next-card" hidden>
+      <span class="next-label">Up next</span>
+      <span class="next-name" id="t-then"></span>
+    </div>
 
     <div class="controls">
-      <button class="btn btn-ghost" id="stop">Stop</button>
-      <button class="btn btn-primary" id="pause">Pause</button>
-      <button class="btn btn-ghost" id="skip">Skip</button>
+      <button class="ctrl" id="back" aria-label="Back to previous move">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="solid" d="M7 6h2v12H7zM19 6v12l-9-6z"/></svg>
+        <span>Back</span>
+      </button>
+      <button class="ctrl ctrl-main" id="pause" aria-label="Pause">
+        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path class="solid" d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>
+        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true" hidden><path class="solid" d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="ctrl" id="skip" aria-label="Skip to next">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="solid" d="M15 6h2v12h-2zM5 6v12l9-6z"/></svg>
+        <span>Skip</span>
+      </button>
     </div>
     <p class="sr-only" id="announce" aria-live="polite"></p>
   </section>
+
+  <!-- "Are you sure?" before ending a workout -->
+  <dialog id="confirm-end" class="sheet" aria-labelledby="confirm-title">
+    <form method="dialog">
+      <h2 id="confirm-title">End this workout?</h2>
+      <p>The timer is paused. You can pick up where you left off, or end it here.</p>
+      <div class="sheet-actions">
+        <button class="btn btn-primary" value="keep" autofocus>Keep going</button>
+        <button class="btn btn-ghost" value="end">End workout</button>
+      </div>
+    </form>
+  </dialog>
 
   <!-- 3. Done -->
   <section id="done" class="screen" hidden>

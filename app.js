@@ -35,7 +35,7 @@ const ROUTINES = [
       },
       {
         name: "Overhead pull-down", band: "Loop band", cue: "Arms up overhead, band around wrists. Pull elbows down to your sides like a goalpost, then reach up.", q: "mini band overhead lat pulldown form",
-        alt: { name: "Overhead press", band: "Long band", cue: "Stand on the band, hands at shoulders. Press straight up without arching your back, lower slowly.", q: "resistance band overhead shoulder press standing on band" },
+        alt: { name: "Single-arm overhead press", band: "Long band", cue: "Stand on one end of the band, hold the other end at your shoulder. Press straight up without arching your back, lower slowly. Switch arms at round two.", q: "single arm resistance band overhead press standing on band" },
       },
       {
         name: "Elbow-tucked rotations", band: "Loop band", cue: "Elbows glued to your sides, bent 90°. Rotate forearms outward against the band.", q: "mini band external rotation elbows at side",
@@ -47,7 +47,7 @@ const ROUTINES = [
       },
       {
         name: "Wall slides", band: "Loop band", cue: "Forearms on a wall, band around wrists. Press out gently and slide arms up, then back down.", q: "banded wall slide forearms mini band",
-        alt: { name: "Lateral raise", band: "Long band", cue: "Stand on the band, arms by your sides. Lift arms out to shoulder height with a slight bend in the elbows, lower slowly.", q: "resistance band lateral raise standing on band" },
+        alt: { name: "Single-arm lateral raise", band: "Long band", cue: "Stand on one end of the band, hold the other end by your side. Lift your arm out to shoulder height with a slight bend in the elbow, lower slowly. Switch arms at round two.", q: "single arm resistance band lateral raise standing on band" },
       },
     ],
   },
@@ -256,6 +256,9 @@ function unlockScreen() {
 
 /* ---------- Timer ---------- */
 
+const PHASES = { ready: "Get ready", work: "Go", rest: "Breathe · next up" };
+const RING_LENGTH = 2 * Math.PI * 54; // matches the circle's r in index.html
+
 // The whole workout as a flat list of intervals
 function buildPlan(routine) {
   const n = routine.moves.length;
@@ -278,6 +281,8 @@ const run = {
   routine: null,
   moves: [],      // the chosen version of each move for this workout
   plan: [],
+  secsAfter: [],  // seconds left in the workout after each interval
+  totalSecs: 0,
   index: 0,
   endsAt: 0,      // performance.now() timestamp when the current interval ends
   remaining: 0,   // ms left, used while paused
@@ -287,6 +292,8 @@ const run = {
   interval: 0,
 };
 
+const formatTime = (secs) => `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
+
 function startWorkout() {
   initAudio();
   lockScreen();
@@ -294,14 +301,31 @@ function startWorkout() {
   // Use whichever version (loop / long band) is picked for each move
   run.moves = run.routine.moves.map((m) => resolveMove(run.routine, m));
   run.plan = buildPlan(run.routine);
+  run.secsAfter = run.plan.map((_, i) => run.plan.slice(i + 1).reduce((t, s) => t + s.secs, 0));
+  run.totalSecs = run.secsAfter[0] + run.plan[0].secs;
   run.paused = false;
-  $("pause").textContent = "Pause";
+  $("t-routine").textContent = run.routine.title;
+  buildTimeline();
   showScreen("timer");
   enterInterval(0, performance.now());
+  setPausedUI(false);
   loop();
   // Backup ticker in case animation frames are throttled
   clearInterval(run.interval);
   run.interval = setInterval(tick, 250);
+}
+
+function buildTimeline() {
+  const line = $("timeline");
+  line.innerHTML = "";
+  run.plan.forEach((step, i) => {
+    const seg = document.createElement("span");
+    seg.className = "seg seg-" + step.type;
+    seg.style.flexGrow = step.secs;
+    // A small gap where round two starts
+    if (i > 0 && step.round > run.plan[i - 1].round) seg.classList.add("round-start");
+    line.appendChild(seg);
+  });
 }
 
 function enterInterval(index, startTime) {
@@ -309,6 +333,10 @@ function enterInterval(index, startTime) {
   const step = run.plan[index];
   run.endsAt = startTime + step.secs * 1000;
   run.lastShownSec = null;
+  [...$("timeline").children].forEach((seg, i) => {
+    seg.style.setProperty("--p", i < index ? 1 : 0);
+    seg.classList.toggle("is-current", i === index);
+  });
   renderStep(step);
 }
 
@@ -319,8 +347,7 @@ function renderStep(step) {
   timer.classList.toggle("is-ready", step.type === "ready");
   timer.classList.toggle("is-rest", step.type === "rest");
 
-  const phase = { ready: "Get ready", work: "Go", rest: "Breathe · next up" }[step.type];
-  $("phase").textContent = phase;
+  $("phase").textContent = run.paused ? "Paused" : PHASES[step.type];
   $("position").textContent = `Round ${step.round} of ${ROUNDS} · move ${step.move + 1} of ${moves.length}`;
   $("t-name").textContent = move.name;
   $("t-band").textContent = move.band || "";
@@ -328,11 +355,34 @@ function renderStep(step) {
   $("t-cue").textContent = move.cue;
   $("t-demo").href = demoUrl(move.q);
 
-  // "Then: …" only during work, and not on the very last move
+  // "Up next" only during work, and not on the very last move
   const next = run.plan[run.index + 2]; // index+1 is the rest
-  $("t-then").textContent = step.type === "work" && next ? `Then: ${moves[next.move].name}` : "";
+  const showNext = step.type === "work" && next;
+  $("t-then").textContent = showNext ? moves[next.move].name : "";
+  $("next-card").hidden = !showNext;
 
-  $("announce").textContent = `${phase}. ${move.name}.`;
+  $("announce").textContent = `${PHASES[step.type]}. ${move.name}.`;
+}
+
+// Draw the ring, timeline and clocks for the time left in this interval
+function paint(msLeft) {
+  const step = run.plan[run.index];
+  const done = Math.min(1, Math.max(0, 1 - msLeft / (step.secs * 1000)));
+  $("ring").style.strokeDasharray = RING_LENGTH;
+  $("ring").style.strokeDashoffset = RING_LENGTH * done;
+  $("timeline").children[run.index].style.setProperty("--p", done);
+
+  const secsLeft = Math.ceil(msLeft / 1000);
+  if (secsLeft !== run.lastShownSec) {
+    // Ticks on the last 3 seconds
+    if (run.lastShownSec !== null && !run.paused && secsLeft <= 3 && secsLeft >= 1) sounds.tick();
+    run.lastShownSec = secsLeft;
+    $("count").textContent = secsLeft;
+    const workoutLeft = run.secsAfter[run.index] + secsLeft;
+    $("t-left").textContent = formatTime(workoutLeft) + " left";
+    $("timeline").setAttribute("aria-valuenow",
+      Math.round(100 * (1 - workoutLeft / run.totalSecs)));
+  }
 }
 
 function tick() {
@@ -347,23 +397,14 @@ function tick() {
     enterInterval(nextIndex, run.endsAt);
     changed = true;
   }
-  if (changed) {
-    const t = run.plan[run.index].type;
-    if (t === "work") sounds.work();
-    else if (t === "rest") sounds.rest();
-  }
+  if (changed) playCue(run.plan[run.index].type);
 
-  const msLeft = run.endsAt - now;
-  const secsLeft = Math.ceil(msLeft / 1000);
-  if (secsLeft !== run.lastShownSec) {
-    // Ticks on the last 3 seconds
-    if (run.lastShownSec !== null && secsLeft <= 3 && secsLeft >= 1) sounds.tick();
-    run.lastShownSec = secsLeft;
-    $("count").textContent = secsLeft;
-  }
+  paint(run.endsAt - now);
+}
 
-  const total = run.plan[run.index].secs * 1000;
-  $("bar").style.transform = `scaleX(${Math.min(1, 1 - msLeft / total)})`;
+function playCue(type) {
+  if (type === "work") sounds.work();
+  else if (type === "rest") sounds.rest();
 }
 
 function loop() {
@@ -375,32 +416,79 @@ function loop() {
   run.frame = requestAnimationFrame(step);
 }
 
+function setPausedUI(paused) {
+  $("timer").classList.toggle("is-paused", paused);
+  $("pause").setAttribute("aria-label", paused ? "Resume" : "Pause");
+  $("pause").querySelector(".i-pause").hidden = paused;
+  $("pause").querySelector(".i-play").hidden = !paused;
+  $("phase").textContent = paused ? "Paused" : PHASES[run.plan[run.index].type];
+}
+
 function togglePause() {
   if (!run.paused) {
     run.paused = true;
     run.remaining = run.endsAt - performance.now();
-    $("pause").textContent = "Resume";
-    $("phase").textContent = "Paused";
   } else {
     initAudio();
     run.paused = false;
     run.endsAt = performance.now() + run.remaining;
-    $("pause").textContent = "Pause";
-    renderStep(run.plan[run.index]);
     run.lastShownSec = Math.ceil(run.remaining / 1000);
   }
+  setPausedUI(run.paused);
+}
+
+// Jump to an interval and start it from the top (used by Skip and Back)
+function jumpTo(index) {
+  if (run.paused) {
+    initAudio();
+    run.paused = false;
+    setPausedUI(false);
+  }
+  enterInterval(index, performance.now());
+  playCue(run.plan[index].type);
+  tick();
 }
 
 function skip() {
   const nextIndex = run.index + 1;
   if (nextIndex >= run.plan.length) { finishWorkout(); return; }
-  if (run.paused) togglePause();
-  enterInterval(nextIndex, performance.now());
-  const t = run.plan[run.index].type;
-  if (t === "work") sounds.work();
-  else if (t === "rest") sounds.rest();
-  tick();
+  jumpTo(nextIndex);
 }
+
+// Back: restart this move if you're a few seconds in, otherwise go to the
+// previous move (stepping over the rest in between)
+function back() {
+  const step = run.plan[run.index];
+  const msLeft = run.paused ? run.remaining : run.endsAt - performance.now();
+  const elapsed = step.secs * 1000 - msLeft;
+  let target = run.index;
+  if (elapsed < 3000 && run.index > 0) {
+    target = run.index - 1;
+    if (run.plan[target].type === "rest" && target > 0) target--;
+  }
+  jumpTo(target);
+}
+
+/* ---------- Ending a workout ---------- */
+
+let resumeAfterDialog = false;
+
+function askToEnd() {
+  const dialog = $("confirm-end");
+  if (typeof dialog.showModal !== "function") {
+    if (window.confirm("End this workout?")) stopWorkout();
+    return;
+  }
+  resumeAfterDialog = !run.paused;
+  if (!run.paused) togglePause();
+  dialog.returnValue = "";
+  dialog.showModal();
+}
+
+$("confirm-end").addEventListener("close", () => {
+  if ($("confirm-end").returnValue === "end") stopWorkout();
+  else if (resumeAfterDialog) togglePause();
+});
 
 function stopTimer() {
   cancelAnimationFrame(run.frame);
@@ -411,6 +499,7 @@ function stopTimer() {
 function stopWorkout() {
   stopTimer();
   showScreen("home");
+  if (reloadPending) location.reload();
 }
 
 function finishWorkout() {
@@ -431,6 +520,9 @@ document.addEventListener("visibilitychange", () => {
 
 /* ---------- Wire up ---------- */
 
+// Set when a new version of the app is ready; applied once you're not mid-workout
+let reloadPending = false;
+
 buildTabs();
 const savedId = recall(STORAGE_KEY);
 const savedIndex = ROUTINES.findIndex((r) => r.id === savedId);
@@ -439,8 +531,12 @@ selectTab(savedIndex >= 0 ? savedIndex : 0);
 $("start").addEventListener("click", startWorkout);
 $("pause").addEventListener("click", togglePause);
 $("skip").addEventListener("click", skip);
-$("stop").addEventListener("click", stopWorkout);
-$("close").addEventListener("click", () => showScreen("home"));
+$("back").addEventListener("click", back);
+$("stop").addEventListener("click", askToEnd);
+$("close").addEventListener("click", () => {
+  showScreen("home");
+  if (reloadPending) location.reload();
+});
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -449,14 +545,9 @@ if ("serviceWorker" in navigator) {
 
   // When a new version takes over, reload to show it, but never mid-workout
   const hadController = !!navigator.serviceWorker.controller;
-  let reloadPending = false;
-  const reloadIfIdle = () => {
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!hadController) return;
     if ($("timer").hidden) location.reload();
     else reloadPending = true;
-  };
-  navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (hadController) reloadIfIdle();
   });
-  $("close").addEventListener("click", () => { if (reloadPending) location.reload(); });
-  $("stop").addEventListener("click", () => { if (reloadPending) location.reload(); });
 }
