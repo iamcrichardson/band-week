@@ -111,7 +111,8 @@ a { color: var(--accent); }
 .home-head h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.02em; }
 .tagline { color: var(--muted); margin: 0.5rem 0 1.25rem; }
 
-.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+/* One equal column per routine, however many there are */
+.tabs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0.5rem; }
 
 .tab {
   font: inherit;
@@ -119,15 +120,16 @@ a { color: var(--accent); }
   color: var(--text);
   border: 2px solid var(--line);
   border-radius: 1rem;
-  padding: 0.75rem 0.5rem;
+  padding: 0.75rem 0.3rem;
   min-height: 6rem;
+  min-width: 0;
   cursor: pointer;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem;
   text-align: center;
   touch-action: manipulation;
 }
 .tab-letter { font-family: var(--font-head); font-weight: 800; font-size: 2rem; line-height: 1; }
-.tab-label { font-size: 0.95rem; line-height: 1.2; color: var(--muted); }
+.tab-label { font-size: 0.85rem; line-height: 1.2; color: var(--muted); overflow-wrap: anywhere; }
 .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .tab[aria-selected="true"] .tab-label { color: var(--on-accent); }
 
@@ -423,7 +425,7 @@ a { color: var(--accent); }
   .t-bar { margin-bottom: 0.5rem; }
   .icon-btn { width: 2.75rem; height: 2.75rem; }
   .position { margin-top: 0.35rem; font-size: 0.95rem; }
-  .dial { width: min(62vw, 24vh, 18rem); margin: 0.5rem auto 0.35rem; }
+  .dial { width: min(62vw, 23vh, 18rem); margin: 0.5rem auto 0.35rem; }
   .count { font-size: clamp(3rem, 9vh, 7rem); }
   .move-name { font-size: 1.45rem; margin-bottom: 0.25rem; }
   .band-label { margin-bottom: 0.4rem; font-size: 0.9rem; }

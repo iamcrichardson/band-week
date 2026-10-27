@@ -7,8 +7,13 @@
      band: which band it uses, shown on the timer (e.g. "Loop band")
      alt:  a second version you can pick with a toggle on the home screen,
            written as { name, cue, q, band }
-   Optional extra on a routine:
-     note: one line of helper text shown above its list
+     sides: true  — do it on one side, then a short "Switch sides" pause,
+                    then the other side (both get the same time)
+   Optional extras on a routine:
+     note:      one line of helper text shown above its list
+     timing:    { ready, work, rest, rounds } to override the defaults below
+     workLabel: what the timer says during each move (default "Go")
+     doneLine:  the line under "[Routine]: sorted." at the end
    ===================================================================== */
 const ROUTINES = [
   {
@@ -63,9 +68,28 @@ const ROUTINES = [
       { name: "Banded toe taps", cue: "On your back, band just above your knees, knees over hips at 90°. Keep your ribs down, lower one foot to tap the floor, alternate.", q: "banded toe taps mini band core" },
     ],
   },
+  {
+    id: "S",
+    title: "Morning stretch",
+    equipment: "No band needed. A mat, rug or your bed is fine.",
+    note: "Go gently: stretch to mild tension, never pain. If stiffness hangs around, or you get numbness or tingling, check in with a GP or physio.",
+    timing: { ready: 10, work: 40, rest: 10, rounds: 1 },
+    workLabel: "Stretch",
+    doneLine: "Nice and loose. Come back any morning you like.",
+    moves: [
+      { name: "Knee hugs", cue: "Lie on your back and hug both knees towards your chest. Rock gently side to side if it feels good.", q: "knees to chest stretch lower back" },
+      { name: "Knee rolls", cue: "On your back, knees bent, feet flat, arms out. Slowly let both knees fall to one side, then the other. Keep your shoulders down.", q: "lying knee rolls lower back mobility" },
+      { name: "Cat-cow", cue: "On hands and knees. Breathe in, let your belly drop and look up. Breathe out, round your back and tuck your chin. Move slowly.", q: "cat cow stretch beginner" },
+      { name: "Thread the needle", sides: true, cue: "On hands and knees. Slide one arm under your body along the floor, resting that shoulder and your head down. Feel it between your shoulder blades.", q: "thread the needle stretch upper back" },
+      { name: "Child's pose", cue: "Kneel, sit back towards your heels and walk your hands forward. Rest your forehead down and breathe into your back.", q: "childs pose stretch beginner" },
+      { name: "Chin tucks", cue: "Sit or stand tall. Gently slide your chin straight back, like making a double chin. Hold a moment, release, repeat.", q: "chin tucks neck exercise" },
+      { name: "Neck side stretch", sides: true, cue: "Sit or stand tall, shoulders relaxed. Tilt your ear towards your shoulder until you feel a gentle stretch. No pulling.", q: "neck side stretch ear to shoulder" },
+      { name: "Shoulder rolls", cue: "Stand tall, arms relaxed. Slowly roll your shoulders up, back and down in big circles.", q: "shoulder rolls stretch" },
+    ],
+  },
 ];
 
-/* Timing, in seconds */
+/* Default timing, in seconds (a routine can override these with "timing") */
 const READY_SECS = 10;
 const WORK_SECS = 35;
 const REST_SECS = 15;
@@ -265,28 +289,40 @@ function unlockScreen() {
 /* ---------- Timer ---------- */
 
 const PHASES = { ready: "Get ready", work: "Go", rest: "Breathe · next up" };
+const SIDE_LABELS = { 1: "First side", 2: "Other side" };
 const RING_LENGTH = 2 * Math.PI * 54; // matches the circle's r in index.html
 
+const timingFor = (routine) =>
+  ({ ready: READY_SECS, work: WORK_SECS, rest: REST_SECS, rounds: ROUNDS, ...routine.timing });
+
 // The whole workout as a flat list of intervals
-function buildPlan(routine) {
-  const n = routine.moves.length;
-  const plan = [{ type: "ready", secs: READY_SECS, move: 0, round: 1 }];
-  for (let round = 1; round <= ROUNDS; round++) {
-    for (let i = 0; i < n; i++) {
-      plan.push({ type: "work", secs: WORK_SECS, move: i, round });
-      const isLast = round === ROUNDS && i === n - 1;
-      if (!isLast) {
-        const nextMove = (i + 1) % n;
-        const nextRound = i === n - 1 ? round + 1 : round;
-        plan.push({ type: "rest", secs: REST_SECS, move: nextMove, round: nextRound });
-      }
-    }
+function buildPlan(moves, timing) {
+  // Every piece of work in order; two-sided moves become two pieces
+  const works = [];
+  for (let round = 1; round <= timing.rounds; round++) {
+    moves.forEach((m, i) => {
+      if (m.sides) works.push({ move: i, round, side: 1 }, { move: i, round, side: 2 });
+      else works.push({ move: i, round });
+    });
   }
+  const plan = [{ type: "ready", secs: timing.ready, ...works[0] }];
+  works.forEach((w, i) => {
+    plan.push({ type: "work", secs: timing.work, ...w });
+    const next = works[i + 1];
+    if (next) plan.push({ type: "rest", secs: timing.rest, ...next, switching: next.side === 2 });
+  });
   return plan;
+}
+
+function phaseLabel(step) {
+  if (step.type === "work") return run.routine.workLabel || PHASES.work;
+  if (step.type === "rest" && step.switching) return "Switch sides";
+  return PHASES[step.type];
 }
 
 const run = {
   routine: null,
+  rounds: ROUNDS,
   moves: [],      // the chosen version of each move for this workout
   plan: [],
   secsAfter: [],  // seconds left in the workout after each interval
@@ -308,7 +344,9 @@ function startWorkout() {
   run.routine = ROUTINES[selected];
   // Use whichever version (loop / long band) is picked for each move
   run.moves = run.routine.moves.map((m) => resolveMove(run.routine, m));
-  run.plan = buildPlan(run.routine);
+  const timing = timingFor(run.routine);
+  run.rounds = timing.rounds;
+  run.plan = buildPlan(run.moves, timing);
   run.secsAfter = run.plan.map((_, i) => run.plan.slice(i + 1).reduce((t, s) => t + s.secs, 0));
   run.totalSecs = run.secsAfter[0] + run.plan[0].secs;
   run.paused = false;
@@ -355,23 +393,29 @@ function renderStep(step) {
   timer.classList.toggle("is-ready", step.type === "ready");
   timer.classList.toggle("is-rest", step.type === "rest");
 
-  $("phase").textContent = run.paused ? "Paused" : PHASES[step.type];
-  $("position").textContent = `Round ${step.round} of ${ROUNDS} · move ${step.move + 1} of ${moves.length}`;
+  $("phase").textContent = run.paused ? "Paused" : phaseLabel(step);
+  const position = `move ${step.move + 1} of ${moves.length}`;
+  $("position").textContent = run.rounds > 1
+    ? `Round ${step.round} of ${run.rounds} · ${position}`
+    : position[0].toUpperCase() + position.slice(1);
   $("t-name").textContent = move.name;
-  $("t-band").textContent = move.band || "";
-  $("t-band").hidden = !move.band;
+  // Small label under the name: which band, and/or which side
+  const chip = [move.band, SIDE_LABELS[step.side]].filter(Boolean).join(" · ");
+  $("t-band").textContent = chip;
+  $("t-band").hidden = !chip;
   $("t-cue").textContent = move.cue;
   $("t-demo").href = demoUrl(move.q);
   showPicture($("t-pic"), move);
   $("timer").classList.toggle("has-pic", !$("t-pic").hidden);
 
   // "Up next" only during work, and not on the very last move
-  const next = run.plan[run.index + 2]; // index+1 is the rest
+  const next = run.plan.slice(run.index + 1).find((s) => s.type === "work");
   const showNext = step.type === "work" && next;
-  $("t-then").textContent = showNext ? moves[next.move].name : "";
+  $("t-then").textContent = !showNext ? ""
+    : moves[next.move].name + (next.side === 2 ? " · other side" : "");
   $("next-card").hidden = !showNext;
 
-  $("announce").textContent = `${PHASES[step.type]}. ${move.name}.`;
+  $("announce").textContent = `${phaseLabel(step)}. ${move.name}.`;
 }
 
 // Draw the ring, timeline and clocks for the time left in this interval
@@ -431,7 +475,7 @@ function setPausedUI(paused) {
   $("pause").setAttribute("aria-label", paused ? "Resume" : "Pause");
   $("pause").querySelector(".i-pause").hidden = paused;
   $("pause").querySelector(".i-play").hidden = !paused;
-  $("phase").textContent = paused ? "Paused" : PHASES[run.plan[run.index].type];
+  $("phase").textContent = paused ? "Paused" : phaseLabel(run.plan[run.index]);
 }
 
 function togglePause() {
@@ -516,6 +560,7 @@ function finishWorkout() {
   stopTimer();
   sounds.finish();
   $("done-title").textContent = `${run.routine.title}: sorted.`;
+  $("done-sub").textContent = run.routine.doneLine || "That's this one covered for the week.";
   showScreen("done");
   $("close").focus();
 }
