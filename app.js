@@ -79,12 +79,10 @@ const ROUTINES = [
     moves: [
       { name: "Knee hugs", cue: "Lie on your back and hug both knees towards your chest. Rock gently side to side if it feels good.", q: "knees to chest stretch lower back" },
       { name: "Knee rolls", cue: "On your back, knees bent, feet flat, arms out. Slowly let both knees fall to one side, then the other. Keep your shoulders down.", q: "lying knee rolls lower back mobility" },
-      { name: "Cat-cow", cue: "On hands and knees. Breathe in, let your belly drop and look up. Breathe out, round your back and tuck your chin. Move slowly.", q: "cat cow stretch beginner" },
-      { name: "Thread the needle", sides: true, cue: "On hands and knees. Slide one arm under your body along the floor, resting that shoulder and your head down. Feel it between your shoulder blades.", q: "thread the needle stretch upper back" },
       { name: "Child's pose", cue: "Kneel, sit back towards your heels and walk your hands forward. Rest your forehead down and breathe into your back.", q: "childs pose stretch beginner" },
       { name: "Chin tucks", cue: "Sit or stand tall. Gently slide your chin straight back, like making a double chin. Hold a moment, release, repeat.", q: "chin tucks neck exercise" },
       { name: "Neck side stretch", sides: true, cue: "Sit or stand tall, shoulders relaxed. Tilt your ear towards your shoulder until you feel a gentle stretch. No pulling.", q: "neck side stretch ear to shoulder" },
-      { name: "Shoulder rolls", cue: "Stand tall, arms relaxed. Slowly roll your shoulders up, back and down in big circles.", q: "shoulder rolls stretch" },
+      { name: "Shoulder rolls", cue: "Sit or stand tall, arms relaxed. Slowly roll your shoulders up, back and down in big circles.", q: "shoulder rolls stretch" },
     ],
   },
 ];
