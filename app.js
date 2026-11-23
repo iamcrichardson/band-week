@@ -39,7 +39,7 @@ const ROUTINES = [
     moves: [
       {
         name: "Band pull-apart", band: "Loop band", cue: "Light band around wrists, arms straight out in front. Pull hands apart, squeeze shoulder blades.", q: "mini band pull apart wrists form",
-        alt: { name: "Bent-over row", band: "Long band", cue: "Stand on the band, hinge forward with a flat back. Pull your elbows back past your ribs, squeeze, lower slowly.", q: "resistance band bent over row standing on band" },
+        alt: { name: "Single-arm row", band: "Long band", sides: true, cue: "Step one foot forward onto the band, free hand on that knee. Hinge forward, flat back. Pull your elbow back past your ribs, lower slowly.", q: "single arm resistance band row standing on band staggered stance" },
       },
       {
         name: "Overhead pull-down", band: "Loop band", cue: "Arms up overhead, band around wrists. Pull elbows down to your sides like a goalpost, then reach up.", q: "mini band overhead lat pulldown form",
@@ -47,7 +47,7 @@ const ROUTINES = [
       },
       {
         name: "Elbow-tucked rotations", band: "Loop band", cue: "Elbows glued to your sides, bent 90°. Rotate forearms outward against the band.", q: "mini band external rotation elbows at side",
-        alt: { name: "Bicep curl", band: "Long band", cue: "Stand on the band, palms forward, elbows pinned to your sides. Curl up, lower slowly.", q: "resistance band bicep curl standing on band" },
+        alt: { name: "Single-arm bicep curl", band: "Long band", sides: true, cue: "Stand on the band with one foot, hold it in the hand on that side, palm forward. Elbow pinned to your side, curl up, lower slowly.", q: "single arm resistance band bicep curl standing on band" },
       },
       {
         name: "Counter push-up", band: "Loop band", cue: "Hands on the kitchen counter, body in a straight line. Lower chest towards the edge, push away.", q: "incline push up kitchen counter beginner",
