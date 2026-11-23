@@ -32,13 +32,18 @@
   <!-- 1. Home -->
   <main id="home" class="screen">
     <header class="home-head">
-      <h1>Band Week</h1>
+      <div class="head-row">
+        <h1>Band Week</h1>
+        <button class="icon-btn" id="open-sound" aria-label="Sound and cues">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path class="solid" d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+        </button>
+      </div>
       <p class="tagline">Three short routines. Do each once a week, any day, any order. Plus a gentle stretch for any morning you like.</p>
     </header>
 
-    <div class="tabs" role="tablist" aria-label="Routines" id="tabs"></div>
-
     <section id="panel" class="panel" role="tabpanel" aria-labelledby="">
+      <h2 class="panel-title" id="panel-title"></h2>
+      <p class="panel-meta" id="panel-meta"></p>
       <p class="equipment" id="equipment"></p>
       <p class="note" id="note" hidden></p>
       <ol class="moves" id="moves"></ol>
@@ -49,6 +54,9 @@
     </div>
   </main>
 
+  <!-- App-style tab bar along the bottom -->
+  <nav class="tabbar" role="tablist" aria-label="Routines" id="tabs"></nav>
+
   <!-- 2. Timer -->
   <section id="timer" class="screen" hidden>
     <header class="t-bar">
@@ -57,6 +65,9 @@
       </button>
       <p class="t-routine" id="t-routine"></p>
       <p class="t-left" id="t-left"></p>
+      <button class="icon-btn" id="timer-sound" aria-label="Sound and cues">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="solid" d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+      </button>
     </header>
 
     <!-- Timeline: one segment per interval, for this workout only -->
@@ -117,6 +128,33 @@
       <div class="sheet-actions">
         <button class="btn btn-primary" value="keep" autofocus>Keep going</button>
         <button class="btn btn-ghost" value="end">End workout</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Sound settings -->
+  <dialog id="sound-sheet" class="sheet sheet-settings" aria-labelledby="sound-title">
+    <form method="dialog">
+      <h2 id="sound-title">Sound + cues</h2>
+      <p>So you know when to start and stop without looking at the phone.</p>
+      <div class="switches">
+        <label class="switch-row">
+          <span><b>Voice</b><small>Says "Go", "Rest", "Switch sides" and the move</small></span>
+          <input type="checkbox" role="switch" data-pref="voice">
+        </label>
+        <label class="switch-row">
+          <span><b>Beeps</b><small>A different beep for go, rest and switch, plus 3, 2, 1</small></span>
+          <input type="checkbox" role="switch" data-pref="beeps">
+        </label>
+        <label class="switch-row">
+          <span><b>Vibrate</b><small>Buzzes on each change (Android only)</small></span>
+          <input type="checkbox" role="switch" data-pref="vibrate">
+        </label>
+      </div>
+      <button type="button" class="btn btn-ghost btn-test" id="test-sound">Test sound</button>
+      <p class="tip">Can't hear it? Turn up the <b>media</b> volume (press volume up while the app is open), and check sound isn't going to Bluetooth headphones or a speaker.</p>
+      <div class="sheet-actions">
+        <button class="btn btn-primary" value="done">Done</button>
       </div>
     </form>
   </dialog>
